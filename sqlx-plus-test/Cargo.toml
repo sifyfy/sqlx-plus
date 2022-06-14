@@ -1,0 +1,18 @@
+[package]
+name = "sqlx-plus-test"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1"
+async-trait = "0.1"
+sqlx = { version = "0.5", features = [
+    "sqlite",
+    "mysql",
+    "runtime-tokio-rustls",
+] }
+sqlx-plus = { path = ".." }
+tokio = { version = "1", features = ["full"] }

@@ -1,0 +1,20 @@
+[workspace]
+members = [".", "sqlx-plus-macros", "sqlx-plus-test"]
+
+[package]
+name = "sqlx-plus"
+version = "0.1.0"
+edition = "2021"
+authors = ["sifyfy <sifyfy@sifyfy.dev>"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+async-trait = "0.1"
+itertools = "0.10"
+sqlx = { version = "0.5", features = ["runtime-tokio-rustls"] }
+tokio = { version = "1", features = ["full"] }
+
+# sqlx-plus-macros = "0.1" # For Release
+sqlx-plus-macros = { path = "./sqlx-plus-macros" } # For Dev
