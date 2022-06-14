@@ -5,6 +5,10 @@ members = [".", "sqlx-plus-macros", "sqlx-plus-test"]
 name = "sqlx-plus"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "A sqlx extension library focused on making INSERT more convenient."
+repository = "https://github.com/sifyfy/sqlx-plus"
+readme = "README.md"
 authors = ["sifyfy <sifyfy@sifyfy.dev>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -16,5 +20,5 @@ itertools = "0.10"
 sqlx = { version = "0.5", features = ["runtime-tokio-rustls"] }
 tokio = { version = "1", features = ["full"] }
 
-# sqlx-plus-macros = "0.1" # For Release
-sqlx-plus-macros = { path = "./sqlx-plus-macros" } # For Dev
+sqlx-plus-macros = "0.1" # For Release
+# sqlx-plus-macros = { path = "./sqlx-plus-macros" } # For Dev
