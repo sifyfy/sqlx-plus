@@ -2,7 +2,6 @@ use std::borrow::Cow;
 
 use async_trait::async_trait;
 use sqlx::prelude::*;
-use sqlx_plus::QueryBindExt;
 
 #[tokio::test]
 async fn test_main() -> anyhow::Result<()> {
@@ -85,6 +84,8 @@ where
     for<'e> &'e mut T: sqlx::Executor<'e, Database = sqlx::Sqlite>,
 {
     async fn setup_user(&mut self) -> anyhow::Result<()> {
+        use sqlx_plus::QueryBindExt;
+
         sqlx_plus::bulk_insert(
             &[
                 UserInsert {
@@ -143,6 +144,8 @@ where
         name: &str,
         password: &str,
     ) -> Result<Option<User>, anyhow::Error> {
+        use sqlx_plus::QueryBindExt;
+
         sqlx::query_as("SELECT * FROM user WHERE name = ? AND password = ?")
             .bind_multi(&[name, password])
             .fetch_optional(self)

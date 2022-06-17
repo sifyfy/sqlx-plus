@@ -30,7 +30,7 @@ fn impl_insertable(ast: &syn::DeriveInput) -> TokenStream {
 
             fn bind_fields<'q, Q>(&'q self, q: Q) -> Q
             where
-                Q: QueryBindExt<'q, Self::Database>
+                Q: sqlx_plus::QueryBindExt<'q, Self::Database>
             {
                 q #( .bind(&self.#fields) )*
             }
