@@ -9,7 +9,7 @@ publish = false
 [dependencies]
 anyhow = "1"
 async-trait = "0.1"
-sqlx = { version = "0.5", features = [
+sqlx = { version = "0.6", features = [
     "sqlite",
     "mysql",
     "runtime-tokio-rustls",
