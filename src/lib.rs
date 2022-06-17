@@ -1,3 +1,8 @@
+//! # sqlx-plus
+//!
+//! Please refer [README](https://github.com/sifyfy/sqlx-plus).
+//!
+
 use itertools::Itertools;
 use sqlx::{database::HasArguments, Executor, IntoArguments};
 
