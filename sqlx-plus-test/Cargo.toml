@@ -6,13 +6,15 @@ publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+[dev-dependencies]
 anyhow = "1"
 async-trait = "0.1"
+chrono = "0.4"
 sqlx = { version = "0.6", features = [
     "sqlite",
     "mysql",
     "runtime-tokio-rustls",
+    "all-types",
 ] }
-sqlx-plus = { path = ".." }
+sqlx-plus = { path = "..", features = ["sqlite"] }
 tokio = { version = "1", features = ["full"] }

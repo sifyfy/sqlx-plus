@@ -1,19 +1,53 @@
 use std::borrow::Cow;
 
 use async_trait::async_trait;
+use chrono::NaiveDateTime;
 use sqlx::prelude::*;
+use sqlx_plus::Inserter;
 
 #[tokio::test]
 async fn test_main() -> anyhow::Result<()> {
-    let pool = sqlx::sqlite::SqlitePool::connect("sqlite::memory:").await?;
+    let pool = sqlx::sqlite::SqlitePool::connect("sqlite://:memory:").await?;
 
     {
         let mut conn = pool.acquire().await?;
-        let mut tx = conn.begin().await?;
+        let mut tx: sqlx::Transaction<sqlx::Sqlite> = conn.begin().await?;
 
         tx.setup_tables().await?;
         tx.setup_user().await?;
+
+        tx.bulk_insert(&[UserInsert {
+            name: Cow::from("hoge1.5"),
+            password: Cow::from("password4"),
+            created_at: chrono::NaiveDate::from_ymd(2022, 6, 20).and_hms(1, 2, 3),
+        }])
+        .await?;
+
+        tx.insert(&UserInsert {
+            name: Cow::from("hoge1.6"),
+            password: Cow::from("password4"),
+            created_at: chrono::NaiveDate::from_ymd(2022, 6, 20).and_hms(1, 2, 3),
+        })
+        .await?;
+
         tx.commit().await?;
+    }
+    {
+        let mut conn = pool.acquire().await?;
+
+        conn.insert(&UserInsert {
+            name: Cow::from("hoge1.7"),
+            password: Cow::from("password4"),
+            created_at: chrono::NaiveDate::from_ymd(2022, 6, 20).and_hms(1, 2, 3),
+        })
+        .await?;
+
+        conn.bulk_insert(&[UserInsert {
+            name: Cow::from("hoge1.8"),
+            password: Cow::from("password4"),
+            created_at: chrono::NaiveDate::from_ymd(2022, 6, 20).and_hms(1, 2, 3),
+        }])
+        .await?;
     }
 
     {
@@ -26,7 +60,8 @@ async fn test_main() -> anyhow::Result<()> {
             Some(User {
                 id: 3,
                 name: "xxxSHINICHIxxx".into(),
-                password: "password3".into()
+                password: "password3".into(),
+                created_at: chrono::NaiveDate::from_ymd(2022, 6, 20).and_hms(1, 2, 3),
             })
         );
 
@@ -37,6 +72,7 @@ async fn test_main() -> anyhow::Result<()> {
                 id: 4,
                 name: "hoge".into(),
                 password: "password4".into(),
+                created_at: chrono::NaiveDate::from_ymd(2022, 6, 20).and_hms(1, 2, 3),
             })
         );
 
@@ -61,7 +97,8 @@ impl SetupDatabase for sqlx::Transaction<'_, Database> {
                 CREATE TABLE user (
                     id          INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                     name        TEXT NOT NULL UNIQUE,
-                    password    TEXT NOT NULL
+                    password    TEXT NOT NULL,
+                    created_at  DATETIME
                 );
             "#,
         )
@@ -86,36 +123,34 @@ where
     async fn setup_user(&mut self) -> anyhow::Result<()> {
         use sqlx_plus::QueryBindExt;
 
-        sqlx_plus::bulk_insert(
-            &[
-                UserInsert {
-                    name: Cow::from("aaabbb"),
-                    password: Cow::from("password1"),
-                },
-                UserInsert {
-                    name: Cow::from("heyheyhey"),
-                    password: Cow::from("password2"),
-                },
-                UserInsert {
-                    name: Cow::from("xxxSHINICHIxxx"),
-                    password: Cow::from("password3"),
-                },
-            ],
-            self,
-        )
-        .await?;
+        let now = chrono::NaiveDate::from_ymd(2022, 6, 20).and_hms(1, 2, 3);
 
-        sqlx_plus::insert(
-            &UserInsert {
-                name: Cow::from("hoge"),
-                password: Cow::from("password4"),
+        self.bulk_insert(&[
+            UserInsert {
+                name: Cow::from("aaabbb"),
+                password: Cow::from("password1"),
+                created_at: now,
             },
-            self,
-        )
+            UserInsert {
+                name: Cow::from("heyheyhey"),
+                password: Cow::from("password2"),
+                created_at: now,
+            },
+            UserInsert {
+                name: Cow::from("xxxSHINICHIxxx"),
+                password: Cow::from("password3"),
+                created_at: now,
+            },
+        ])
         .await?;
 
-        let user = "fuga";
-        let password = "password5";
+        self.insert(&UserInsert {
+            name: Cow::from("hoge"),
+            password: Cow::from("password4"),
+            created_at: now,
+        })
+        .await?;
+
         sqlx::query(r#"INSERT INTO user (name, password) VALUES (?, ?)"#)
             .bind_multi(&["fuga", "password5"])
             .execute(self)
@@ -169,6 +204,7 @@ struct User {
     id: i64,
     name: UserName,
     password: String,
+    created_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, sqlx_plus::Insertable)]
@@ -176,4 +212,5 @@ struct User {
 struct UserInsert<'a> {
     name: Cow<'a, str>,
     password: Cow<'a, str>,
+    created_at: NaiveDateTime,
 }

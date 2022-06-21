@@ -17,8 +17,14 @@ authors = ["sifyfy <sifyfy@sifyfy.dev>"]
 anyhow = { version = "1", features = ["backtrace"] }
 async-trait = "0.1"
 itertools = "0.10"
-sqlx = { version = "0.6", features = ["runtime-tokio-rustls"] }
+sqlx = { version = "0.6", features = ["runtime-tokio-rustls", "all-types"] }
 tokio = { version = "1", features = ["full"] }
 
 sqlx-plus-macros = "0.1" # For Release
 # sqlx-plus-macros = { path = "./sqlx-plus-macros" } # For Dev
+
+[features]
+sqlite = ["sqlx/sqlite"]
+mysql = ["sqlx/mysql"]
+postgres = ["sqlx/postgres"]
+mssql = ["sqlx/mssql"]
